@@ -1,0 +1,11 @@
+{
+  "name": "weatherAppTerminal",
+  "version": "1.0.0",
+  "description": "WeatherApp",
+  "main": "index.js",
+  "author": "Ali Ramazon",
+  "license": "MIT",
+  "dependencies": {
+    "request": "2.88.0"
+  }
+}
