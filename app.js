@@ -1,6 +1,5 @@
-const request = require('request');
-const config = require('./config/config.json');
-const KEY = config['keys']['MAPS_API_KEY'];
+const geocode = require('./geocode/geocode');
+const weather = require('./weather/weather');
 const yargs = require('yargs');
 
 const argv = yargs
@@ -15,24 +14,21 @@ const argv = yargs
     .help()
     .alias('help', 'h')
     .argv;
-
-    console.log(argv);
     
 const { address } = argv;
-const encodedAddress = encodeURIComponent(address);
-
-request({
-   url: `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}&key=${KEY}`,
-   json: true
-}, (error, response, body) => {
-    if (error) {
-       console.log('Unable to connect to Google servers');
-       console.log(error);
-       
-    } else if (body.status === 'ZERO_RESULTS') {
-        console.log('Unable to find that address');
-    } else if (body.status === 'OK') {
-        console.log(body.results[0].formatted_address);
-        console.log(body.results[0].geometry.location);
+geocode.geocodeAddress(address, (errorMessage, results) => {
+    if (errorMessage) {
+        console.log(errorMessage);
+    } else {
+        const {address, latitude, longitude } = results;
+        console.log(address);
+        
+        weather.getWeather(latitude, longitude, (errorMessage, response) => {
+            if(errorMessage) {
+                console.log(errorMessage);
+            } else {
+                console.log(`It is currently ${response.temp}. It feels like ${response.apparentTemp}`);                
+            }
+        })
     }
 });
